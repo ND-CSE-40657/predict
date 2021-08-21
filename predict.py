@@ -38,7 +38,7 @@ def getline(prompt=''):
             if c == '<EOS>':
                 break
             prediction.append(c)
-            q = lm.read(q, c)
+            q = lm.input(q, c)
         prediction = ''.join(prediction)
         
         # Print prediction
@@ -72,21 +72,25 @@ def getline(prompt=''):
         else:
             print(c, end='', flush=True)
             chars.append(c)
-            states.append(lm.read(states[-1], c))
+            states.append(lm.input(states[-1], c))
     return ''.join(chars)
 
 if __name__ == "__main__":
+    
+    # Process command-line arguments (change as needed)
+    
     import argparse
-    import unigram
-
     parser = argparse.ArgumentParser()
     parser.add_argument(dest='train')
     args = parser.parse_args()
 
+    # Replace the following lines with an instantiation of your model #####
+    
+    import unigram
     data = [list(line.rstrip('\n')) for line in open(args.train)]
-
-    ##### Replace this line with an instantiation of your model #####
     lm = unigram.Unigram(data)
+    
+    # End replace
 
     while True:
         try:

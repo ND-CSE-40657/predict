@@ -23,16 +23,12 @@ class Unigram:
         
         return None
 
-    def read(self, q, a):
+    def input(self, q, a):
         """Return the state that the model would be in if it's in state `q`
-        and reads symbol `a`. (Again, a unigram model doesn't have state, so
+        and inputs symbol `a`. (Again, a unigram model doesn't have state, so
         this just returns `None`.)"""
         
         return None
-
-    def logprob(self, q, a):
-        """Return the log-probability of `a` when the model is in state `q`."""
-        return math.log(self.count[a]/self.total)
 
     def best(self, q):
         """Return the symbol with highest probability when the model is in 

@@ -17,13 +17,17 @@ def getline(prompt=''):
     without the trailing newline. If the user presses Ctrl-D at the
     beginning of the line, raises EOFError.
     """
-    
+
     print(prompt, end='', flush=True)
-    states = [lm.start()]
+    q = lm.start()
+    q, p = lm.step(q, lm.vocab.numberize('<BOS>'))
+    states = [q]
+    probs = [p]
     chars = []
-    prediction = ''
+    prediction = []
 
     def erase():
+        """Erase the previous prediction without moving the cursor."""
         if len(prediction) > 0:
             print(' '*len(prediction) + f'\x1b[{len(prediction)}D', end='', flush=True)
     
@@ -33,17 +37,17 @@ def getline(prompt=''):
         erase()
         prediction = []
         q = states[-1]
+        p = probs[-1]
         for i in range(20):
-            c = lm.best(q)
+            c = max(lm.vocab, key=lambda c: p[lm.vocab.numberize(c)])
             if c == '<EOS>':
                 break
             prediction.append(c)
-            q = lm.input(q, c)
-        prediction = ''.join(prediction)
+            q, p = lm.step(q, lm.vocab.numberize(c))
         
         # Print prediction
         if len(prediction) > 0:
-            print('\x1b[7m' + prediction + f'\x1b[0m\x1b[{len(prediction)}D', end='', flush=True)
+            print('\x1b[7m' + ''.join(prediction) + f'\x1b[0m\x1b[{len(prediction)}D', end='', flush=True)
 
         # Read and process character
         c = getchar()
@@ -67,12 +71,16 @@ def getline(prompt=''):
             else:
                 erase()
                 print(f'\x1b[1D', end='', flush=True)
-                chars.pop()
                 states.pop()
+                probs.pop()
+                chars.pop()
         else:
             print(c, end='', flush=True)
+            q = states[-1]
+            q, p = lm.step(q, lm.vocab.numberize(c))
+            states.append(q)
+            probs.append(p)
             chars.append(c)
-            states.append(lm.input(states[-1], c))
     return ''.join(chars)
 
 if __name__ == "__main__":
@@ -84,11 +92,13 @@ if __name__ == "__main__":
     parser.add_argument(dest='train')
     args = parser.parse_args()
 
-    # Replace the following lines with an instantiation of your model #####
+    # Replace the following lines with an instantiation of your model
     
-    import unigram
+    #import unigram
+    import ngram
     data = [list(line.rstrip('\n')) for line in open(args.train)]
-    lm = unigram.Unigram(data)
+    #lm = unigram.Unigram(data)
+    lm = ngram.Ngram(data, 5)
     
     # End replace
 

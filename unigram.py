@@ -1,5 +1,6 @@
 import collections
 import math
+import utils
 
 class Unigram:
     """A unigram language model.
@@ -10,12 +11,17 @@ class Unigram:
     """
     
     def __init__(self, data):
-        self.count = collections.Counter()
-        self.total = 0
+        self.vocab = utils.Vocab()
+        count = collections.Counter()
+        total = 0
         for line in data:
             for a in list(line) + ['<EOS>']:
-                self.count[a] += 1
-                self.total += 1
+                self.vocab.add(a)
+                a = self.vocab.numberize(a)
+                count[a] += 1
+                total += 1
+        self.logprob = [math.log(count[a]/total) if count[a] > 0 else -math.inf
+                        for a in range(len(self.vocab))]
 
     def start(self):
         """Return the language model's start state. (A unigram model doesn't
@@ -23,14 +29,17 @@ class Unigram:
         
         return None
 
-    def input(self, q, a):
-        """Return the state that the model would be in if it's in state `q`
-        and inputs symbol `a`. (Again, a unigram model doesn't have state, so
-        this just returns `None`.)"""
-        
-        return None
+    def step(self, q, anum):
+        """Compute one step of the language model.
 
-    def best(self, q):
-        """Return the symbol with highest probability when the model is in 
-        state `q`."""
-        return max(self.count, key=self.count.get)
+        Arguments:
+        - q: The current state of the model
+        - anum: The (numberized) most recently seen symbol (int)
+
+        Return: (r, pb), where
+        - r: The state of the model after reading `a`
+        - pb: The log-probability distribution over the next symbol
+        """
+        
+        return (None, self.logprob)
+

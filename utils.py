@@ -23,6 +23,8 @@ class Vocab(collections.abc.MutableSet):
         self.word_to_num[word] = num
     def discard(self, word):
         raise NotImplementedError()
+    def update(self, words):
+        self |= words
     def __contains__(self, word):
         return word in self.word_to_num
     def __len__(self):

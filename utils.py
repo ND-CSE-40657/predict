@@ -43,11 +43,12 @@ class Vocab(collections.abc.MutableSet):
         """Convert a number into a word."""
         return self.num_to_word[num]
 
-def split(s, delim=None):
+def split(line, delim=None):
+    line = line.rstrip('\r\n')
     if delim == '':
-        return list(s)
+        return list(line)
     else:
-        return s.split(delim)
+        return line.split(delim)
 
 def read_parallel(ffilename, efilename, delim=None):
     """Read data from the files named by `ffilename` and `efilename`.

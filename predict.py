@@ -94,11 +94,9 @@ if __name__ == "__main__":
 
     # Replace the following lines with an instantiation of your model
     
-    #import unigram
-    import ngram
+    import unigram
     data = [list(line.rstrip('\n')) for line in open(args.train)]
-    #lm = unigram.Unigram(data)
-    lm = ngram.Ngram(data, 5)
+    lm = unigram.Unigram(data)
     
     # End replace
 

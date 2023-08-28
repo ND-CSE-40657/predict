@@ -42,3 +42,55 @@ class Vocab(collections.abc.MutableSet):
     def denumberize(self, num):
         """Convert a number into a word."""
         return self.num_to_word[num]
+
+def split(s, delim=None):
+    if delim == '':
+        return list(s)
+    else:
+        return s.split(delim)
+
+def read_parallel(ffilename, efilename, delim=None):
+    """Read data from the files named by `ffilename` and `efilename`.
+
+    The files should have the same number of lines.
+
+    Arguments:
+      - ffilename: str
+      - efilename: str
+      - delim: delimiter between symbols (default: any whitespace)
+    Returns: list of pairs of lists of strings. <BOS> and <EOS> are added to all sentences.
+    """
+    data = []
+    for (fline, eline) in zip(open(ffilename), open(efilename)):
+        fwords = ['<BOS>'] + split(fline, delim) + ['<EOS>']
+        ewords = ['<BOS>'] + split(eline, delim) + ['<EOS>']
+        data.append((fwords, ewords))
+    return data
+
+def read_mono(filename, delim=None):
+    """Read sentences from the file named by `filename`.
+
+    Arguments:
+      - filename
+      - delim: delimiter between symbols (default: any whitespace)
+    Returns: list of lists of strings. <BOS> and <EOS> are added to each sentence.
+    """
+    data = []
+    for line in open(filename):
+        words = ['<BOS>'] + split(line, delim) + ['<EOS>']
+        data.append(words)
+    return data
+
+def write_mono(data, filename, delim=' '):
+    """Write sentences to the file named by `filename`.
+
+    Arguments:
+      - data: list of lists of strings. <BOS> and <EOS> are stripped off.
+      - filename: str
+      - delim: delimiter between symbols (default: space)
+    """
+    with open(filename, 'w') as outfile:
+        for words in data:
+            if len(words) > 0 and words[0] == '<BOS>': words.pop(0)
+            if len(words) > 0 and words[-1] == '<EOS>': words.pop(-1)
+            print(delim.join(words), file=outfile)
